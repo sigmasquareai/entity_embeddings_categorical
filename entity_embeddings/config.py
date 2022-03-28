@@ -71,7 +71,7 @@ class Config:
                  verbose: bool = False,
                  artifacts_path: str = 'artifacts'):
         # input validations
-        check_csv_data(csv_path)
+        # check_csv_data(csv_path)
         check_target_name(target_name)
         check_train_ratio(train_ratio)
         check_epochs(epochs)

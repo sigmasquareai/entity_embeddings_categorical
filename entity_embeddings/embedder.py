@@ -70,6 +70,7 @@ class Embedder:
 
         report = classification_report(self.y_val, res, output_dict=True)
         df = pd.DataFrame(report).transpose()
+        # TODO: change this path to set to something better
         df.to_csv('./classification_reports/res_50.csv', index=False)
 
         if not os.path.exists(self.config.artifacts_path):
