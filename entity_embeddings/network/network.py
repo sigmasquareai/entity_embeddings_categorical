@@ -10,6 +10,7 @@ from keras.callbacks import History
 from keras.engine import Layer
 from keras.layers import Embedding, Reshape
 from keras.models import Model as KerasModel
+from keras.callbacks import EarlyStopping
 
 from entity_embeddings.config import Config
 from entity_embeddings.util.preprocessing_utils import transpose_to_list
@@ -51,6 +52,8 @@ class EmbeddingNetwork:
 
         for category in self.config.categories:
             input_category = Input(shape=(1,))
+
+            print(f"category.unique_values::", category.unique_values)
             output_category = Embedding(input_dim=category.unique_values,
                                         output_dim=category.embedding_size,
                                         name=category.alias)(input_category)
@@ -73,15 +76,19 @@ class EmbeddingNetwork:
 
         self.max_log_y = max(np.max(np.log(y_train)), np.max(np.log(y_val)))
 
+        #es_callback = EarlyStopping(monitor='val_acc', patience=5)
+
         history = self.model.fit(x=transpose_to_list(X_train),
                                  y=self._val_for_fit(y_train),
                                  validation_data=(transpose_to_list(X_val), self._val_for_fit(y_val)),
                                  epochs=self.config.epochs,
-                                 batch_size=self.config.batch_size, )
+                                 batch_size=self.config.batch_size)#,
+                                 #callbacks=[es_callback])
         return history
 
     def _val_for_fit(self, val):
-        val = np.log(val) / self.max_log_y
+        val_np = np.log(val) / self.max_log_y
+        # print("Val_np::", val_np)
         return val
 
     def _val_for_pred(self, val):

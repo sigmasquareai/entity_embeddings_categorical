@@ -2,8 +2,9 @@ from abc import ABC, abstractmethod
 from typing import List
 
 from keras.engine import Layer
-from keras.layers import Dense, Activation, Concatenate
+from keras.layers import Dense, Activation, Concatenate, Dropout
 from keras.models import Model as KerasModel
+from keras.optimizers import Adam
 
 from entity_embeddings.processor.target_type import TargetType
 
@@ -28,21 +29,27 @@ class ModelAssembler(ABC):
 
     def make_hidden_layers(self, outputs: List[Layer]) -> Layer:
         output_model = Concatenate()(outputs)
-        output_model = Dense(1000, kernel_initializer="uniform")(output_model)
+        # output_model = Dense(256, kernel_initializer="uniform")(output_model)
+        # output_model = Activation('relu')(output_model)
+        # output_model = Dropout(0.5) (output_model)
+        output_model = Dense(128, kernel_initializer="uniform")(output_model)
         output_model = Activation('relu')(output_model)
-        output_model = Dense(500, kernel_initializer="uniform")(output_model)
-        output_model = Activation('relu')(output_model)
+        output_model = Dropout(0.5) (output_model)
         return output_model
 
 
 class BinaryClassificationAssembler(ModelAssembler):
     def make_final_layer(self, previous_layer: Layer) -> Layer:
+        print("Binary Classifier Assembler...")
         output_model = Dense(1)(previous_layer)
         output_model = Activation('sigmoid')(output_model)
         return output_model
 
     def compile_model(self, model):
-        model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+        print("Compile model...")
+        # model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+        model.compile(loss='binary_crossentropy', optimizer=Adam(1e-4), metrics=['accuracy'])
+        model.summary()
         return model
 
 
@@ -57,6 +64,7 @@ class MulticlassClassificationAssembler(ModelAssembler):
 
     def compile_model(self, model):
         model.compile(loss='categorical_crossentropy', optimizer='adam')
+        model.summary()
         return model
 
 
@@ -68,4 +76,5 @@ class RegressionClassificationAssembler(ModelAssembler):
 
     def compile_model(self, model):
         model.compile(loss='mean_absolute_error', optimizer='adam')
+        model.summary()
         return model
