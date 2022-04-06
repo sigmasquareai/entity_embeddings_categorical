@@ -96,6 +96,8 @@ class Config:
 
         self.unique_classes = self.df[self.target_name].nunique()
 
+        # import pdb; pdb.set_trace()
+
         self.categories: List[Category] = generate_categories_from_df(self.df, self.target_name)
 
         # artifacts related fields

@@ -28,13 +28,16 @@ class ModelAssembler(ABC):
         raise NotImplementedError("Your model assembler should override the method compile_model")
 
     def make_hidden_layers(self, outputs: List[Layer]) -> Layer:
+
+        from keras.layers import LeakyReLU, ELU
+
         output_model = Concatenate()(outputs)
-        # output_model = Dense(256, kernel_initializer="uniform")(output_model)
-        # output_model = Activation('relu')(output_model)
-        # output_model = Dropout(0.5) (output_model)
-        output_model = Dense(128, kernel_initializer="uniform")(output_model)
-        output_model = Activation('relu')(output_model)
-        output_model = Dropout(0.5) (output_model)
+        output_model = Dense(64, kernel_initializer="uniform")(output_model)
+        output_model = Activation(ELU(0.2))(output_model)
+        output_model = Dropout(0.3) (output_model)
+        output_model = Dense(32, kernel_initializer="uniform")(output_model)
+        output_model = Activation(ELU(0.2))(output_model)
+        output_model = Dropout(0.3) (output_model)
         return output_model
 
 

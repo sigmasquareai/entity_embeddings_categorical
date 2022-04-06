@@ -78,11 +78,18 @@ class EmbeddingNetwork:
 
         #es_callback = EarlyStopping(monitor='val_acc', patience=5)
 
+
+        from sklearn.utils import class_weight
+        class_weight = class_weight.compute_class_weight('balanced', np.unique(y_train), y_train)
+
+        print("class_weights:", class_weight)
+
         history = self.model.fit(x=transpose_to_list(X_train),
                                  y=self._val_for_fit(y_train),
                                  validation_data=(transpose_to_list(X_val), self._val_for_fit(y_val)),
                                  epochs=self.config.epochs,
-                                 batch_size=self.config.batch_size)#,
+                                 batch_size=self.config.batch_size,
+                                 class_weight = class_weight)#,
                                  #callbacks=[es_callback])
         return history
 
